@@ -1,6 +1,6 @@
 FROM python:3.6
 
- create workdir
+# create workdir
 RUN mkdir -p /src/
 WORKDIR /src
 
