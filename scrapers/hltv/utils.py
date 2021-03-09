@@ -163,35 +163,38 @@ def transcribe_data(driver):
 	return table_data
 
 
+
 def postgres_db_insert(data, db_credentials):
-	"""Insert GGBet odds data into database.
+    """Insert GGBet odds data into database.
 
-	PARAMS
-	------
-	data : list of tuples
-		List of tuples containing ordered entries of team_1, team_2, team_1_winner_odds, team_2_winner_odds, draw_odds,
-		bet_type, scrape_time, match_time, tournament_name, source.
-	db_credentials : dict
-		A dictionary containing key-value log in credentials for the database.
-	"""
+    PARAMS
+    ------
+    data : list of tuples
+    List of tuples containing ordered entries of team_1, team_2, team_1_winner_odds, team_2_winner_odds,
+    scrape_time, match_time, tournament_name, source.
+    db_credentials : dict
+    A dictionary containing key-value log in credentials for the database.
+    """
 
-	conn = None
-	insert_statement = """
-		INSERT INTO csgo_winner_odds (
-			team_1, team_2, team_1_winner_odds, team_2_winner_odds, draw_odds, bet_type, scrape_time, match_time, tournament_name, source
-		)
-		VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-	"""
+    conn = None
+    insert_statement = """
+    INSERT INTO matches (
+    team_1, team_2, team_1_winner_odds, team_2_winner_odds, draw_odds, bet_type, scrape_time, match_time, tournament_name, source
+    )
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
+    """
 
-	try:
-		conn = psycopg2.connect(**db_credentials)
-		cursor = conn.cursor()
-		cursor.executemany(insert_statement, data)
-		conn.commit()
-		cursor.close()
-		logger.info('Inserted %s rows.', len(data))
-	except psycopg2.DatabaseError:
-		logger.error('Failed to insert %s rows into database.', len(data))
-	finally:
-		if conn:
-			conn.close()
+    try:
+        conn = psycopg2.connect(**db_credentials)
+        cursor = conn.cursor()
+        cursor.executemany(insert_statement, data)
+        conn.commit()
+        cursor.close()
+        logger.info('Inserted %s rows.', len(data))
+    except psycopg2.DatabaseError as err:
+        logger.error(err)
+        logger.error('Failed to insert %s rows into database.', len(data))
+    finally:
+        if conn:
+            conn.close()
+

@@ -1,7 +1,6 @@
 FROM python:3.6
-LABEL maintainer Max Lamberti <maximilien.lamberti@gmail.com>
 
-# create workdir
+ create workdir
 RUN mkdir -p /src/
 WORKDIR /src
 

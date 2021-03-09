@@ -36,7 +36,7 @@ if __name__ == '__main__':
 	chrome_options.add_argument('--headless')
 	chrome_options.add_argument('--no-sandbox')
 	chrome_options.add_argument('--disable-dev-shm-usage')
-	driver = webdriver.Chrome(chrome_options=chrome_options)
+	driver = webdriver.Chrome(options=chrome_options)
 
 	# load website
 	driver.get(GGBET_URL)
@@ -51,9 +51,15 @@ if __name__ == '__main__':
 	table_text = remove_header(soup.text)
 	table_text = insert_row_breaks(table_text)
 	table_rows = table_text.split('_ROW_BREAK_')
-	formatted_data = transcribe_table_data(table_rows)
+	formatted_data = transcribe_table_data(table_rows)[1:]
 	logger.info('Finished processing of %s rows.', len(formatted_data))
-
-	if len(formatted_data) > 0:
+	# insert to db
+	if ENVIRONMENT == 'PRODUCTION' and len(formatted_data) > 0:
+		logger.info('Inserting %s rows into database.', len(formatted_data))
+		postgres_db_insert(table, DB_CREDENTIALS)
+	elif len(table) == 0:
+		logger.warning('EGB data scrape produced 0 data points.')
+	else:
 		logger.info('Inserting %s rows into database.', len(formatted_data))
 		postgres_db_insert(formatted_data, DB_CREDENTIALS)
+	driver.quit()

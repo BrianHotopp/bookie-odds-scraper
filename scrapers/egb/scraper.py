@@ -61,3 +61,4 @@ if __name__ == '__main__':
 		logger.warning('EGB data scrape produced 0 data points.')
 	else:
 		logger.info('Produced data: %s', table)
+	driver.quit()

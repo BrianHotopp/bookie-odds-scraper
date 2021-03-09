@@ -23,10 +23,7 @@ def remove_header(html, cutoff='RESULTS', separator='\n', padding_token='_PADDIN
     """Removes table header and inserts padding_tokens instead of the separator."""
 
     tokenized_html = html.split(separator)
-    for idx, token in enumerate(tokenized_html):
-        if token == cutoff:
-            break
-    headless_html = padding_token.join(tokenized_html[idx+1:])
+    headless_html = padding_token.join(tokenized_html)
 
     return headless_html
 
@@ -111,11 +108,10 @@ def get_tournament_cut_index(row):
 
 def get_match_time(row, idx):
     """Extract the match time from a row od data."""
-
     tm = row[idx]
     dt = row[idx + 1]
     try:
-        match_time = datetime.datetime.strptime(dt + ' ' + tm, '%b %d %H:%M').replace(year=2019)
+        match_time = datetime.datetime.strptime(dt + ' ' + tm, '%d.%m %H:%M').replace(year=datetime.datetime.today().year)
         match_time = int(datetime.datetime.timestamp(match_time))
     except:  # usually screws up when match is TODAY
         match_time = -1
@@ -241,7 +237,7 @@ def postgres_db_insert(data, db_credentials):
 
     conn = None
     insert_statement = """
-        INSERT INTO csgo_winner_odds (
+        INSERT INTO matches (
             team_1, team_2, team_1_winner_odds, team_2_winner_odds, draw_odds, bet_type, scrape_time, match_time, tournament_name, source
         )
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
@@ -254,7 +250,8 @@ def postgres_db_insert(data, db_credentials):
         conn.commit()
         cursor.close()
         logger.info('Inserted %s rows.', len(data))
-    except psycopg2.DatabaseError:
+    except psycopg2.DatabaseError as err:
+        logger.error(err)
         logger.error('Failed to insert %s rows into database.', len(data))
     finally:
         if conn:
