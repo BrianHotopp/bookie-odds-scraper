@@ -82,7 +82,7 @@ def postgres_db_upsert(data, db_credentials):
 
 	conn = None
 	insert_statement = """
-		INSERT INTO csgo_match_results (
+		INSERT INTO matches (
 			hash_id, team_1, team_2, team_1_score, team_2_score, tournament, matchtype, match_time
 		)
 		VALUES (%s, %s, %s, %s, %s, %s, %s, %s)

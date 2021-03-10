@@ -45,7 +45,7 @@ def get_book_makers(driver):
 def get_team_names(raw_html):
 	"""Get a list of team names for a given tournament."""
 
-	html = BeautifulSoup(raw_html).find_all("div", class_="team-name")
+	html = BeautifulSoup(raw_html, "html.parser").find_all("div", class_="team-name")
 	team_names = [team.text for team in html]
 
 	return team_names
@@ -54,7 +54,7 @@ def get_team_names(raw_html):
 def get_bet_types(raw_html):
 	"""Get the bet type of the match, for example BO3."""
 
-	html = BeautifulSoup(raw_html).find_all("div", class_="bet-best-of")
+	html = BeautifulSoup(raw_html, "html.parser").find_all("div", class_="bet-best-of")
 	bet_types = [bet.text for bet in html]
 
 	return bet_types
@@ -63,7 +63,7 @@ def get_bet_types(raw_html):
 def get_tournament_name(raw_html):
 	"""Get the tournament name from the html object of the tournament."""
 
-	html = BeautifulSoup(raw_html)
+	html = BeautifulSoup(raw_html, "html.parser")
 	tournament_name = html.contents[0].contents[0].text
 
 	return tournament_name
@@ -111,7 +111,6 @@ def transcribe_data(driver):
 	num_bookmakers = len(bookmakers)
 	html = driver.page_source
 	tournaments = ['<div class="event-header' + s for s in html.split('<div class="event-header')][1:]
-
 	for tournament in tournaments:
 
 		tournament_name = get_tournament_name(tournament)
@@ -121,6 +120,7 @@ def transcribe_data(driver):
 
 		row_idx = 0
 		rows_by_team = []
+		print(html_rows)
 		for row in html_rows:  # extract data, still in wrong format
 
 			if not is_valid_bookie(row):
@@ -139,7 +139,6 @@ def transcribe_data(driver):
 				'bet_type': bet_types[bet_type_idx]
 			}
 			rows_by_team.append(row_data)
-
 		# reformat data for postgres insertion
 		for match_idx, match in enumerate(rows_by_team):
 
@@ -178,7 +177,7 @@ def postgres_db_insert(data, db_credentials):
 
     conn = None
     insert_statement = """
-    INSERT INTO matches (
+    INSERT INTO odds (
     team_1, team_2, team_1_winner_odds, team_2_winner_odds, draw_odds, bet_type, scrape_time, match_time, tournament_name, source
     )
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);

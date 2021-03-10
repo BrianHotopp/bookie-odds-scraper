@@ -56,7 +56,7 @@ if __name__ == '__main__':
 	# insert to db
 	if ENVIRONMENT == 'PRODUCTION' and len(formatted_data) > 0:
 		logger.info('Inserting %s rows into database.', len(formatted_data))
-		postgres_db_insert(table, DB_CREDENTIALS)
+		postgres_db_insert(formatted_data, DB_CREDENTIALS)
 	elif len(table) == 0:
 		logger.warning('EGB data scrape produced 0 data points.')
 	else:

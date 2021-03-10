@@ -237,7 +237,7 @@ def postgres_db_insert(data, db_credentials):
 
     conn = None
     insert_statement = """
-        INSERT INTO matches (
+        INSERT INTO odds (
             team_1, team_2, team_1_winner_odds, team_2_winner_odds, draw_odds, bet_type, scrape_time, match_time, tournament_name, source
         )
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
