@@ -23,7 +23,7 @@ def get_bookie_name(html):
         for html_attr in html.contents:
                 try:
                         class_string = ' '.join(html_attr['class'])
-                        if 'betting-list-odds-provider' in class_string:
+                        if 'b-list-odds-provider' in class_string:
                                 name = class_string.split('-')[-1]
                                 break
                 except TypeError:
@@ -37,7 +37,7 @@ def get_book_makers(driver):
 
         bookmakers = driver.find_elements_by_class_name('provider-cell')
         bookmakers = [bookie.get_attribute('class') for bookie in bookmakers]
-        bookmakers = [bookie[27:] for bookie in bookmakers if 'hidden' not in bookie]
+        bookmakers = [bookie.split('b-list-')[1] for bookie in bookmakers if 'hidden' not in bookie]
 
         return bookmakers
 
@@ -71,11 +71,10 @@ def get_tournament_name(raw_html):
 
 def get_odds_rows(raw_html):
         """Filters rows and returns only the rows that contain odds data."""
-
+        # returns a list of beautifulsoup soup elements representing the
         separator = '/td>'
         rows = [tok + separator for tok in raw_html.split(separator) if 'odds b-list-odds' in tok]
         html_rows = [BeautifulSoup(r, 'html.parser') for r in rows]
-
         return html_rows
 
 
@@ -94,7 +93,7 @@ def is_valid_bookie(row):
 
 def decode_row(row):
         """Extract the bookie name and the odds for a team from a row of data."""
-
+        print(row)
         bookie_name = get_bookie_name(row)
         odds = convert_to_number(row.text)
 
@@ -138,6 +137,7 @@ def transcribe_data(driver):
                                 'bet_type': bet_types[bet_type_idx]
                         }
                         rows_by_team.append(row_data)
+                print(rows_by_team)
                 # reformat data for postgres insertion
                 for match_idx, match in enumerate(rows_by_team):
 
