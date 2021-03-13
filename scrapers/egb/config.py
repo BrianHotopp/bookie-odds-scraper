@@ -1,6 +1,6 @@
 
 
-EGB_URL = 'https://egb.com/esports/counter-strike#'
+EGB_URL = 'https://egb.com/esports/csgo'
 
 
 LOGGING = {

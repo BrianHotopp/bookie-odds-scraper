@@ -86,7 +86,7 @@ def postgres_db_upsert(data, db_credentials):
 			hash_id, team_1, team_2, team_1_score, team_2_score, tournament, matchtype, match_time
 		)
 		VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-		ON CONFLICT (hash_id) DO UPDATE 
+		ON CONFLICT (hash_id) DO UPDATE
 		SET match_time = EXCLUDED.match_time;
 	"""
 

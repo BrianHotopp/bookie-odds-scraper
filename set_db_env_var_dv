@@ -1,1 +1,1 @@
-export DATABASE_URL=postgres://hotopb:hotopb@localhost/csgo
+export DATABASE_URL=postgres://hotopb:mypass@localhost/csgo
