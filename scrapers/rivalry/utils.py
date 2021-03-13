@@ -42,9 +42,11 @@ def transcribe_table_data(table):
                 continue
             # datetime doesn't have great facilities for parsing est/edt so I will manually compute the offsets
             if(current.split(' ')[1] == "EST"):
-               offset = datetime.timedelta(hours=5)
+                offset = datetime.timedelta(hours=5)
             if(current.split(' ')[1] == "EDT"):
-               offset = datetime.timedelta(hours=4)
+                offset = datetime.timedelta(hours=4)
+            if current.split(' ')[1] == "UTC":
+                offset = datetime.timedelta(hours = 0)
             # produce timestamp we will write to database
             utctime = datetime.datetime.strptime(current.split(' ')[0], "%H:%M") + offset
             utctime = utctime.time()
@@ -76,8 +78,6 @@ def postgres_db_insert(data, db_credentials):
         """
 
         try:
-                print("produced the following data:")
-                print(data)
                 conn = psycopg2.connect(**db_credentials)
                 cursor = conn.cursor()
                 cursor.executemany(insert_statement, data)

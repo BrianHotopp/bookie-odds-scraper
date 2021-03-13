@@ -93,7 +93,6 @@ def is_valid_bookie(row):
 
 def decode_row(row):
         """Extract the bookie name and the odds for a team from a row of data."""
-        print(row)
         bookie_name = get_bookie_name(row)
         odds = convert_to_number(row.text)
 
@@ -137,7 +136,6 @@ def transcribe_data(driver):
                                 'bet_type': bet_types[bet_type_idx]
                         }
                         rows_by_team.append(row_data)
-                print(rows_by_team)
                 # reformat data for postgres insertion
                 for match_idx, match in enumerate(rows_by_team):
 

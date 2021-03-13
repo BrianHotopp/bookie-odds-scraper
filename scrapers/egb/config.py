@@ -23,7 +23,7 @@ LOGGING = {
 			'handlers': ['console'],
 			'level': 'INFO',
 		},
-		'DEV': {
+		'DEVELOPMENT': {
 			'handlers': ['console'],
 			'level': 'DEBUG',
 		}

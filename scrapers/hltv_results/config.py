@@ -4,7 +4,7 @@ HLTV_URL = 'https://www.hltv.org/results?offset=100'
 HLTV_BASE_URL = 'https://www.hltv.org/results?offset='
 
 
-OFFSET_RANGE = (19300, 48000)  # (start, end)
+OFFSET_RANGE = (100, 48000)  # (start, end)
 
 
 LOGGING = {
@@ -27,7 +27,7 @@ LOGGING = {
 			'handlers': ['console'],
 			'level': 'INFO',
 		},
-		'DEV': {
+		'DEVELOPMENT': {
 			'handlers': ['console'],
 			'level': 'DEBUG',
 		}

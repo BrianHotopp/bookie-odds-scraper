@@ -13,10 +13,10 @@ from config import GGBET_URL, LOGGING
 ENVIRONMENT = os.environ['ENVIRONMENT']
 SENTRY_URL = os.environ['SENTRY_URL']
 DB_CREDENTIALS = {
-	'host': os.environ['DB_HOST'],
-	'user': os.environ['DB_USER'],
-	'password': os.environ['DB_PASSWORD'],
-	'dbname': os.environ['DB_NAME']
+        'host': os.environ['DB_HOST'],
+        'user': os.environ['DB_USER'],
+        'password': os.environ['DB_PASSWORD'],
+        'dbname': os.environ['DB_NAME']
 }
 
 
@@ -24,42 +24,49 @@ DB_CREDENTIALS = {
 logging.config.dictConfig(LOGGING)
 logger = logging.getLogger(ENVIRONMENT)
 if ENVIRONMENT == 'PRODUCTION':
-	sentry_sdk.init(SENTRY_URL)
+        sentry_sdk.init(SENTRY_URL)
 
 
 if __name__ == '__main__':
 
-	logger.info('Starting scrape job for ggbet table data.')
+        logger.info('Starting scrape job for GGBET')
 
-	# initialize headless selenium webdriver
-	chrome_options = webdriver.ChromeOptions()
-	chrome_options.add_argument('--headless')
-	chrome_options.add_argument('--no-sandbox')
-	chrome_options.add_argument('--disable-dev-shm-usage')
-	driver = webdriver.Chrome(options=chrome_options)
+        # initialize headless selenium webdriver
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        driver = webdriver.Chrome(options=chrome_options)
 
-	# load website
-	driver.get(GGBET_URL)
-	html = driver.page_source
-	time.sleep(5)  # give webpage time to load table
-	driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  # scroll down to load dynamic content
-	time.sleep(1)
+        # load website
+        driver.get(GGBET_URL)
+        html = driver.page_source
+        time.sleep(5)  # give webpage time to load table
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  # scroll down to load dynamic content
+        time.sleep(1)
 
-	# transcribe data table
-	table = driver.find_element_by_id('betting__container').text
-	soup = BeautifulSoup(table, 'html.parser')
-	table_text = remove_header(soup.text)
-	table_text = insert_row_breaks(table_text)
-	table_rows = table_text.split('_ROW_BREAK_')
-	formatted_data = transcribe_table_data(table_rows)[1:]
-	logger.info('Finished processing of %s rows.', len(formatted_data))
-	# insert to db
-	if ENVIRONMENT == 'PRODUCTION' and len(formatted_data) > 0:
-		logger.info('Inserting %s rows into database.', len(formatted_data))
-		postgres_db_insert(formatted_data, DB_CREDENTIALS)
-	elif len(table) == 0:
-		logger.warning('EGB data scrape produced 0 data points.')
-	else:
-		logger.info('Inserting %s rows into database.', len(formatted_data))
-		postgres_db_insert(formatted_data, DB_CREDENTIALS)
-	driver.quit()
+        # transcribe data table
+        table = driver.find_element_by_id('betting__container').text
+        soup = BeautifulSoup(table, 'html.parser')
+        table_text = remove_header(soup.text)
+        table_text = insert_row_breaks(table_text)
+        table_rows = table_text.split('_ROW_BREAK_')
+        formatted_data = transcribe_table_data(table_rows)[1:]
+        if len(formatted_data) == 1:
+            logger.info('Finished processing %s row', len(formatted_data))
+        else:
+            logger.info('Finished processing %s rows', len(formatted_data))
+            
+        # insert to db
+        if ENVIRONMENT == "PRODUCTION":
+            if len(formatted_data) > 0:
+                logger.info('Inserting %s rows into database', len(formatted_data))
+                postgres_db_insert(formatted_data, DB_CREDENTIALS)
+            else:
+                logger.warning('GGBET data scrape produced 0 data points')
+        elif ENVIRONMENT == "DEVELOPMENT":
+                   logger.info('Produced data: %s', table)
+        else:
+            logger.warning("ENVIRONMENT environment variable not set correctly")
+ 
+        driver.quit()

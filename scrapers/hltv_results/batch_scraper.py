@@ -25,7 +25,7 @@ logger = logging.getLogger(ENVIRONMENT)
 
 if __name__ == '__main__':
 
-	logger.info('Starting batch scrape job for hltv match results data.')
+	logger.info('Starting batch scrape job for hltv match results data')
 
 	# initialize headless selenium webdriver
 	driver = webdriver.Chrome(executable_path='/usr/local/bin/chromedriver')

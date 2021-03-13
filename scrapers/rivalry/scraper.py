@@ -28,7 +28,7 @@ if ENVIRONMENT == 'PRODUCTION':
 
 if __name__ == '__main__':
 
-        logger.info('Starting scrape job for rivalry table data.')
+        logger.info('Starting scrape job for rivalry table data')
 
         # initialize headless selenium webdriver
         chrome_options = webdriver.ChromeOptions()
@@ -45,13 +45,25 @@ if __name__ == '__main__':
         table = driver.find_element_by_id('__nuxt').get_attribute("innerHTML")
         table = transcribe_table_data(table)
 
-        logger.info('Finished processing of %s rows.', len(table))
+        # Output
+        if len(table) == 1:
+            logger.info('Finished processing of %s row', len(table))
+        else:
+            logger.info('Finished processing of %s rows', len(table))
 
         # insert to db
-        if ENVIRONMENT == 'PRODUCTION' and len(table) > 0:
-                logger.info('Inserting %s rows into database.', len(table))
+        if ENVIRONMENT ==  "PRODUCTION":
+            if len(table) > 0:
+                if len(table) == 1:
+                    logger.info('Inserting %s row into database', len(table))
+                else:
+                    logger.info('Inserting %s rows into database', len(table))
                 postgres_db_insert(table, DB_CREDENTIALS)
-        elif len(table) == 0:
-                logger.warning('EGB data scrape produced 0 data points.')
-        else:
+            else:
+                logger.warning('rivalry data scrape produced 0 data points')
+        elif ENVIRONMENT == "DEVELOPMENT":
                 logger.info('Produced data: %s', table)
+        else:
+                logger.warning("ENVIRONMENT environment variable not set correctly")
+
+        driver.quit()

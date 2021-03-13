@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker run --env-file environment.env --network="host" ggbet
+docker run --rm --env-file environment.env --network="host" ggbet
