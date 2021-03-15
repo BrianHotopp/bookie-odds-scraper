@@ -1,4 +1,5 @@
-#!/bin/fish
+#!/bin/bash
+cd /home/scraper/bookie-odds-scraper/scrapers
 docker build ./egb -t egb
 docker build ./ggbet -t ggbet
 docker build ./hltv -t hltv
