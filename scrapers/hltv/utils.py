@@ -155,7 +155,8 @@ def transcribe_data(driver):
                                 match['bookie_name'] + ' (hltv)'
                         )
                         table_data.append(row)
-
+        # don't record matches where the source doesn't provide odds
+        table_data = [x for x in table_data if x[2] != -1 and x[3] != -1]
         return table_data
 
 
